@@ -21,52 +21,51 @@ services:
     working_dir: "/home/agent"
     restart: unless-stopped
     depends_on:
-      - mosquitto
-      # - hivemq
+      # - mosquitto
+      - hivemq
 
-  mosquitto:
-    container_name: mosquitto
-    hostname: mosquitto
-    image: hemsaw/mosquitto:latest
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-    volumes:
-      - "/etc/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf"
-      - "/etc/mqtt/data/passwd:/mosquitto/data/passwd"
-      - "/etc/mqtt/data/acl:/mosquitto/data/acl"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    ports:
-      - 1883:1883/tcp
-      - 9001:9001/tcp
-    restart: unless-stopped
-
-  # hivemq:
-  #   container_name: hivemq
-  #   hostname: hivemq
-  #   image: hemsaw/hivemq-edge
+  # mosquitto:
+  #   container_name: mosquitto
+  #   hostname: mosquitto
+  #   image: hemsaw/mosquitto:latest
   #   labels:
   #     - "com.centurylinklabs.watchtower.enable=true"
-  #   environment:
-  #     - HIVEMQ_LOG_LEVEL=WARN
-  #     - HIVEMQ_CONFIG_FOLDER=/opt/mqtt/conf
   #   volumes:
-  #     - /etc/mqtt/config/config.xml:/opt/mqtt/conf/config.xml
-  #     # - /etc/mqtt/data:/opt/hivemq/data
-  #     # - /etc/mqtt/extensions:/hivemq/extensions
+  #     - "/etc/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+  #     - "/etc/mqtt/data/passwd:/mosquitto/data/passwd"
+  #     - "/etc/mqtt/data/acl:/mosquitto/data/acl"
   #   logging:
   #     driver: "json-file"
   #     options:
   #       max-size: "10m"
   #       max-file: "3"
   #   ports:
-  #     - "1883:1883"
-  #     # - "2442:2442"
-  #     - "8080:8080"
+  #     - 1883:1883/tcp
+  #     - 9001:9001/tcp
   #   restart: unless-stopped
+
+  hivemq:
+    container_name: hivemq
+    hostname: hivemq
+    image: hemsaw/hivemq-edge
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    environment:
+      - HIVEMQ_LOG_LEVEL=WARN
+      - HIVEMQ_CONFIG_FOLDER=/opt/mqtt/conf
+    volumes:
+      - /etc/mqtt/config/config.xml:/opt/mqtt/conf/config.xml
+      # - /etc/mqtt/config/logback.xml:/opt/mqtt/conf/logback.xml
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "1883:1883"
+      # - "2442:2442"
+      - "8080:8080"
+    restart: unless-stopped
 
   watchtower:
     container_name: watchtower
