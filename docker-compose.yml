@@ -21,19 +21,41 @@ services:
     working_dir: "/home/agent"
     restart: unless-stopped
     depends_on:
-      - mosquitto
+      # - mosquitto
+      - nanomq
       # - hivemq
 
-  mosquitto:
-    container_name: mosquitto
-    hostname: mosquitto
-    image: hemsaw/mosquitto:latest
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
+  # mosquitto:
+  #   container_name: mosquitto
+  #   hostname: mosquitto
+  #   image: hemsaw/mosquitto:latest
+  #   labels:
+  #     - "com.centurylinklabs.watchtower.enable=true"
+  #   volumes:
+  #     - "/etc/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+  #     - "/etc/mqtt/data/passwd:/mosquitto/data/passwd"
+  #     - "/etc/mqtt/data/acl:/mosquitto/data/acl"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+  #   ports:
+  #     - 1883:1883/tcp
+  #     - 9001:9001/tcp
+  #   restart: unless-stopped
+
+  nanomq:
+    container_name: nanomq
+    hostname: nanomq
+    image: emqx/nanomq:latest
     volumes:
-      - "/etc/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf"
-      - "/etc/mqtt/data/passwd:/mosquitto/data/passwd"
-      - "/etc/mqtt/data/acl:/mosquitto/data/acl"
+      - "/etc/mqtt/data/nanomq.conf:/nanomq/data/nanomq.conf"
+      - "/etc/mqtt/config/nanomq_acl.conf:/nanomq/config/nanomq_acl.conf"
+      - "/etc/mqtt/config/nanomq_pw.conf:/nanomq/config/nanomq_pw.conf"
+    environment:
+      - NANOMQ_BROKER_URL="nmq-tcp://0.0.0.0:1883"
+      - NANOMQ_CONF_PATH="/nanomq/config/nanomq.conf"
     logging:
       driver: "json-file"
       options:
@@ -41,7 +63,8 @@ services:
         max-file: "3"
     ports:
       - 1883:1883/tcp
-      - 9001:9001/tcp
+      # - 8083:8083/tcp
+      # - 8883:8883/tcp
     restart: unless-stopped
 
   # hivemq:
